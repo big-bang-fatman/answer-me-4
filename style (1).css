@@ -1,0 +1,444 @@
+:root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --accent: #3b82f6;
+    --text: #f1f5f9;
+    --selected: #22d3ee;
+    --correct: #22c55e;
+    --wrong: #ef4444;
+    --steal: #f59e0b;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+    text-align: center;
+}
+
+.screen { display: none; padding: 20px; min-height: 100vh; }
+.screen.active { display: block; }
+.hidden { display: none !important; }
+
+/* ===== شاشة الأسماء ===== */
+.start-card {
+    max-width: 400px;
+    margin: 80px auto;
+    background: var(--card);
+    padding: 40px;
+    border-radius: 20px;
+    border: 1px solid #334155;
+}
+.start-card h1 { font-size: 1.8rem; margin-bottom: 30px; }
+input {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    border: 1px solid #334155;
+    background: #0f172a;
+    color: white;
+    font-size: 1rem;
+    text-align: center;
+}
+input:focus { outline: none; border-color: var(--accent); }
+
+/* ===== شاشة التصنيفات ===== */
+#screen-cats { padding: 30px 20px; }
+#screen-cats h2 { font-size: 1.6rem; margin-bottom: 5px; }
+
+.cats-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px auto;
+    max-width: 700px;
+}
+
+.cat-btn {
+    padding: 18px 28px;
+    background: var(--card);
+    border: 2px solid #334155;
+    color: var(--text);
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: all 0.2s;
+    min-width: 130px;
+}
+.cat-btn:hover:not(.played) { border-color: var(--accent); transform: translateY(-2px); }
+.cat-btn.selected {
+    border-color: var(--selected);
+    background: rgba(34, 211, 238, 0.15);
+    box-shadow: 0 0 16px rgba(34, 211, 238, 0.4);
+    color: var(--selected);
+}
+.cat-btn.played {
+    opacity: 0.25;
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+/* ===== هيدر اللعبة ===== */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e293b;
+    padding: 12px 15px;
+    border-bottom: 2px solid #334155;
+    gap: 10px;
+}
+.team-card {
+    flex: 1;
+    background: #334155;
+    padding: 10px 8px;
+    border-radius: 12px;
+    transition: all 0.3s;
+    border: 3px solid transparent;
+}
+.team-card.active-turn {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+.team-card h3 { margin: 0 0 4px 0; font-size: 1rem; }
+.score-text { font-size: 2rem; font-weight: bold; margin: 4px 0; }
+
+/* ===== المزايا ===== */
+.perks-row { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; }
+.perk-btn {
+    background: #475569;
+    border: 2px solid transparent;
+    color: white;
+    padding: 5px 7px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    transition: all 0.2s;
+}
+.perk-btn:hover:not(.used) { background: #5f7489; }
+.perk-btn.active-perk {
+    animation: glowEffect 1s infinite;
+    border-color: white;
+    background: #1d4ed8;
+}
+.perk-btn.used {
+    opacity: 0.15;
+    pointer-events: none;
+    filter: grayscale(1);
+}
+.delete-perk {
+    background: #7c3aed;
+    border-color: #a855f7;
+}
+.delete-perk.active-perk {
+    animation: glowPurple 1s infinite;
+}
+
+@keyframes glowEffect {
+    0%, 100% { box-shadow: 0 0 5px var(--accent); }
+    50% { box-shadow: 0 0 20px var(--accent); }
+}
+@keyframes glowPurple {
+    0%, 100% { box-shadow: 0 0 5px #a855f7; }
+    50% { box-shadow: 0 0 20px #a855f7; }
+}
+
+/* ===== مؤشر الدور ===== */
+.turn-indicator {
+    background: #1e293b;
+    padding: 6px;
+    font-size: 0.9rem;
+    color: #94a3b8;
+    border-bottom: 1px solid #334155;
+}
+
+/* ===== لوحة اللعبة ===== */
+.board-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    padding: 0 10px;
+}
+.column { flex: 1; max-width: 180px; }
+.col-header {
+    background: var(--accent);
+    padding: 10px 5px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+.card {
+    background: var(--card);
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 1.3rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid #334155;
+    transition: all 0.2s;
+    color: #93c5fd;
+}
+.card:hover { background: #2d3f56; transform: scale(1.03); border-color: var(--accent); }
+.card.disabled { opacity: 0.08; pointer-events: none; }
+.card.delete-mode { cursor: crosshair; border-color: #a855f7; animation: glowPurple 1s infinite; }
+
+/* ===== مودال السؤال ===== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.92);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.modal-overlay.show { display: flex; }
+
+.modal-content {
+    background: var(--card);
+    padding: 35px 40px;
+    border-radius: 20px;
+    border: 2px solid var(--accent);
+    max-width: 600px;
+    width: 90%;
+    animation: modalIn 0.3s ease;
+}
+@keyframes modalIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.q-team-label {
+    font-size: 0.95rem;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+.q-value-badge {
+    display: inline-block;
+    background: var(--accent);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+#q-display {
+    font-size: 1.5rem;
+    margin: 10px 0 20px;
+    line-height: 1.6;
+}
+
+.ans-controls, #ans-controls { display: flex; gap: 15px; justify-content: center; margin-top: 15px; }
+
+.ans-btn {
+    padding: 14px 30px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+.ans-btn:hover { transform: scale(1.05); }
+.ans-btn.correct { background: var(--correct); color: white; }
+.ans-btn.wrong { background: var(--wrong); color: white; }
+.ans-btn.steal-yes { background: var(--steal); color: #1a1a1a; }
+.ans-btn.steal-no { background: #475569; color: white; }
+
+.answer-text {
+    color: var(--correct);
+    font-size: 1.4rem;
+    margin-top: 20px;
+    padding: 12px;
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: 8px;
+    border: 1px solid var(--correct);
+}
+
+/* ===== السرقة ===== */
+.steal-banner {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid var(--steal);
+    color: var(--steal);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+.steal-btns { display: flex; gap: 15px; justify-content: center; }
+
+/* ===== التسكيت ===== */
+.silence-notice {
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid #a855f7;
+    color: #c084fc;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin: 10px 0;
+}
+
+/* ===== نهاية الجولة ===== */
+.round-end-content { text-align: center; }
+.round-winner-text {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #fbbf24;
+}
+.final-winner-text {
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #fbbf24;
+    margin-bottom: 20px;
+}
+.round-scores {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+.score-display {
+    background: #334155;
+    padding: 15px 25px;
+    border-radius: 12px;
+    min-width: 130px;
+}
+.score-display .team-name { font-size: 0.9rem; color: #94a3b8; }
+.score-display .team-score { font-size: 2rem; font-weight: bold; color: #60a5fa; }
+.score-display.winner { border: 2px solid #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); }
+
+.delete-instruction {
+    background: rgba(168, 85, 247, 0.15);
+    border: 1px solid #a855f7;
+    color: #c084fc;
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+/* ===== القائمة الجانبية ===== */
+.side-menu {
+    position: fixed;
+    top: 0;
+    right: -280px;
+    width: 250px;
+    height: 100%;
+    background: #1e293b;
+    transition: 0.3s;
+    z-index: 2000;
+    padding: 20px;
+    border-left: 2px solid #334155;
+}
+.side-menu.open { right: 0; }
+.side-menu h3 { margin-bottom: 20px; font-size: 1.3rem; }
+.menu-item {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    cursor: pointer;
+    background: #334155;
+    border: none;
+    color: white;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: background 0.2s;
+}
+.menu-item:hover { background: #475569; }
+.close-btn { background: #7f1d1d; margin-top: 20px; }
+.close-btn:hover { background: #991b1b; }
+
+.settings-trigger {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+    flex-shrink: 0;
+}
+
+/* ===== الأزرار العامة ===== */
+.btn-main {
+    padding: 14px 28px;
+    background: var(--accent);
+    border: none;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: all 0.2s;
+    margin-top: 10px;
+}
+.btn-main:hover:not(:disabled) { background: #2563eb; transform: translateY(-1px); }
+.btn-main:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+/* ===== المزايا داخل المودال ===== */
+.modal-perks {
+    background: rgba(51, 65, 85, 0.6);
+    border: 1px solid #475569;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 10px 0 15px;
+}
+.perks-label {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+.modal-perks-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.modal-perks-row .perk-btn {
+    padding: 7px 12px;
+    font-size: 0.85rem;
+}
+
+/* ===== مؤشرات المزايا في الهيدر ===== */
+.perks-status {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-top: 4px;
+    letter-spacing: 2px;
+}
+
+/* ===== نتيجة العجلة ===== */
+.wheel-result {
+    background: rgba(251, 191, 36, 0.15);
+    border: 2px solid #fbbf24;
+    border-radius: 10px;
+    padding: 12px 20px;
+    margin: 8px 0 12px;
+    font-size: 1.2rem;
+    color: #fbbf24;
+    animation: wheelReveal 0.4s ease;
+}
+@keyframes wheelReveal {
+    from { transform: scale(0.8); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+}

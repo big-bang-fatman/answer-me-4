@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جاوب مع راشد</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- القائمة الجانبية -->
+<div id="side-menu" class="side-menu">
+    <h3>الإعدادات</h3>
+    <button class="menu-item" onclick="restartGame()">إعادة اللعبة</button>
+    <button class="menu-item" onclick="goHome()">القائمة الرئيسية</button>
+    <button class="menu-item" onclick="showInstructions()">التعليمات</button>
+    <button class="menu-item close-btn" onclick="toggleMenu()">إغلاق</button>
+</div>
+
+<!-- شاشة الأسماء -->
+<div id="screen-names" class="screen active">
+    <div class="start-card">
+        <h1>🏆 جاوب مع راشد 🏆</h1>
+        <input type="text" id="t1-input" placeholder="اسم الفريق الأول">
+        <input type="text" id="t2-input" placeholder="اسم الفريق الثاني">
+        <button class="btn-main" onclick="startToCats()">دخول المسابقة</button>
+    </div>
+</div>
+
+<!-- شاشة التصنيفات -->
+<div id="screen-cats" class="screen">
+    <h2 id="cats-title">اختر 5 تصانيف للجولة</h2>
+    <p id="cats-subtitle" style="color:#94a3b8; margin-bottom:15px;">اختر التصانيف التي تريدها للجولة</p>
+    <div id="cats-list" class="cats-grid"></div>
+    <button id="btn-confirm-cats" class="btn-main" disabled onclick="confirmAndPlay()">ابدأ اللعب ▶</button>
+</div>
+
+<!-- شاشة اللعبة -->
+<div id="screen-game" class="screen">
+    <div class="game-header">
+        <div id="team-box-0" class="team-card">
+            <h3 id="name-0">الفريق 1</h3>
+            <div id="score-0" class="score-text">0</div>
+            <div class="perks-status" id="perks-status-0"></div>
+            <button id="delete0" class="perk-btn delete-perk hidden" onclick="activateDelete(0)">🗑️ حذف (متبقي: <span id="del-left-0">3</span>)</button>
+        </div>
+
+        <button class="settings-trigger" onclick="toggleMenu()">⚙️</button>
+
+        <div id="team-box-1" class="team-card">
+            <h3 id="name-1">الفريق 2</h3>
+            <div id="score-1" class="score-text">0</div>
+            <div class="perks-status" id="perks-status-1"></div>
+            <button id="delete1" class="perk-btn delete-perk hidden" onclick="activateDelete(1)">🗑️ حذف (متبقي: <span id="del-left-1">3</span>)</button>
+        </div>
+    </div>
+
+    <div id="turn-indicator" class="turn-indicator"></div>
+    <div id="game-board" class="board-container"></div>
+</div>
+
+<!-- مودال السؤال -->
+<div id="q-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div id="q-team-label" class="q-team-label"></div>
+        <div id="q-value-badge" class="q-value-badge"></div>
+        <h1 id="q-display">السؤال؟</h1>
+
+        <!-- أزرار المزايا داخل المودال -->
+        <div id="modal-perks" class="modal-perks">
+            <div class="perks-label">🎮 اختر ميزة قبل الإجابة (اختياري):</div>
+            <div class="modal-perks-row">
+                <button id="m-double" class="perk-btn" onclick="activatePerk('double')">✕2 تدبيل</button>
+                <button id="m-wheel" class="perk-btn" onclick="activatePerk('wheel')">🎡 عجلة</button>
+                <button id="m-half" class="perk-btn" onclick="activatePerk('half')">½ نصف</button>
+                <button id="m-silence" class="perk-btn" onclick="activatePerk('silence')">🤫 تسكيت</button>
+
+            </div>
+        </div>
+
+        <!-- نتيجة العجلة -->
+        <div id="wheel-result" class="wheel-result hidden"></div>
+
+        <!-- أزرار الإجابة الأصلية -->
+        <div id="ans-controls">
+            <button class="ans-btn correct" onclick="handleAnswer(true)">✅ صح</button>
+            <button class="ans-btn wrong" onclick="handleAnswer(false)">❌ خطأ</button>
+        </div>
+
+        <!-- مودال السرقة -->
+        <div id="steal-controls" class="hidden">
+            <div class="steal-banner">
+                <span id="steal-team-name"></span> هل تسرق السؤال؟
+            </div>
+            <div class="steal-btns">
+                <button class="ans-btn steal-yes" onclick="handleSteal(true)">🎯 اسرق</button>
+                <button class="ans-btn steal-no" onclick="handleSteal(false)">❌ لا تسرق</button>
+            </div>
+        </div>
+
+        <!-- أزرار إجابة بعد السرقة -->
+        <div id="steal-ans-controls" class="hidden">
+            <div class="steal-banner" id="steal-ans-label"></div>
+            <button class="ans-btn correct" onclick="handleStealAnswer(true)">✅ صح</button>
+            <button class="ans-btn wrong" onclick="handleStealAnswer(false)">❌ خطأ</button>
+        </div>
+
+        <h2 id="a-display" class="answer-text hidden"></h2>
+    </div>
+</div>
+
+<!-- مودال نهاية الجولة -->
+<div id="round-end-modal" class="modal-overlay">
+    <div class="modal-content round-end-content">
+        <div id="round-winner-text" class="round-winner-text"></div>
+        <div id="round-scores" class="round-scores"></div>
+        <div id="delete-instruction" class="delete-instruction hidden"></div>
+        <button id="next-round-btn" class="btn-main" onclick="goToNextRound()">الجولة التالية ▶</button>
+    </div>
+</div>
+
+<!-- مودال نهاية اللعبة -->
+<div id="game-end-modal" class="modal-overlay">
+    <div class="modal-content round-end-content">
+        <div class="final-winner-text" id="final-winner-text"></div>
+        <div id="final-scores" class="round-scores"></div>
+        <button class="btn-main" onclick="location.reload()">🔁 لعبة جديدة</button>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
