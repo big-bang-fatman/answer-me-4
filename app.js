@@ -245,8 +245,6 @@ function openQ(cat, v, card) {
     document.getElementById('ans-controls').style.display = 'flex';
     document.getElementById('steal-controls').classList.add('hidden');
     document.getElementById('steal-ans-controls').classList.add('hidden');
-    document.getElementById('silence-notice').classList.add('hidden');
-
     // تهيئة أزرار المزايا داخل المودال للفريق الحالي
     renderModalPerks();
 
